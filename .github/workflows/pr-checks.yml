@@ -5,6 +5,7 @@ on:
     branches:
       - lab9
       - main
+  workflow_dispatch:
 
 jobs:
   quality-checks:
