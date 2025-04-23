@@ -1,0 +1,39 @@
+name: CI/CD Checks
+
+on:
+  pull_request:
+    branches:
+      - lab9
+      - main
+
+jobs:
+  quality-checks:
+    name: Quality checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+      
+      - name: before_script
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest-10 --activate
+          pnpm config set store-dir .pnpm-store
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm build
+        
+      - name: Run type checking
+        run: pnpm type-check
+
+      - name: Run linter
+        run: pnpm lint
+
+      - name: Run quality
+        run: pnpm test
