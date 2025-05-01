@@ -76,6 +76,8 @@ jobs:
 
       - name: Run type checking
         run: pnpm type-check
+      - name: Fix linting issues
+        run: pnpm lint --fix
       - name: Run linter
         run: pnpm lint
       - name: Run quality
