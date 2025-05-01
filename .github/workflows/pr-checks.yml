@@ -1,11 +1,6 @@
 name: CI/CD Checks
 
-on:
-  pull_request:
-    branches:
-      - lab9
-      - main
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   quality-checks:
