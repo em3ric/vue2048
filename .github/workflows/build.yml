@@ -11,18 +11,22 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      build:
+      build_project:
+        type: boolean
         description: 'Build the project'
         required: true
-        default: 'true'
-      upload:
+        default: true
+      upload_artifact:
+        type: boolean
         description: 'Upload the artifact'
         required: true
-        default: 'true'
-      analyze:
+        default: true
+      run_analysis:
+        type: boolean
         description: 'Run static analysis'
         required: true
-        default: 'true'
+        default: true
+
 
 jobs:
   push_job:
