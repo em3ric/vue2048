@@ -106,7 +106,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
       - name: Install CLI
-        run: npm install -g @azure/static-web-apps-cli
+        run: pnpm install -g @azure/static-web-apps-cli
       - name: Deploy to QA
         run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-qa --env=production
 
@@ -128,6 +128,6 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
       - name: Install CLI
-        run: npm install -g @azure/static-web-apps-cli
+        run: pnpm install -g @azure/static-web-apps-cli
       - name: Deploy to Production
         run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-prod --env=production
