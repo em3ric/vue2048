@@ -105,6 +105,8 @@ jobs:
           corepack enable
           corepack prepare pnpm@latest-10 --activate
           pnpm config set store-dir .pnpm-store
+      - name: Run pnpm setup
+        run: pnpm setup
 
       # - name: Checkout code
       #   uses: actions/checkout@v4
@@ -137,6 +139,8 @@ jobs:
           corepack enable
           corepack prepare pnpm@latest-10 --activate
           pnpm config set store-dir .pnpm-store
+      - name: Run pnpm setup
+        run: pnpm setup
 
       # - name: Checkout code
       #   uses: actions/checkout@v4
