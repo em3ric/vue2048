@@ -98,6 +98,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+      - name: before_script
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest-10 --activate
+          pnpm config set store-dir .pnpm-store
+
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -120,6 +130,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+      - name: before_script
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest-10 --activate
+          pnpm config set store-dir .pnpm-store
+
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
