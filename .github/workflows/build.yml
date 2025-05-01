@@ -1,4 +1,4 @@
-name: CI/CD Build
+name: CI/CD Application
 
 on:
   push:
@@ -31,19 +31,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v3
-      
       - name: before_script
         run: |
           corepack enable
           corepack prepare pnpm@latest-10 --activate
           pnpm config set store-dir .pnpm-store
-
       - name: Install dependencies
         run: pnpm install
-
       - name: Build project
         run: pnpm build
 
@@ -68,9 +64,7 @@ jobs:
     steps:
       - name: Run type checking
         run: pnpm type-check
-
       - name: Run linter
         run: pnpm lint
-
       - name: Run quality
         run: pnpm test
