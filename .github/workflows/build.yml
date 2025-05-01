@@ -25,26 +25,8 @@ on:
         default: 'true'
 
 jobs:
-  # build-package:
-  #   name: Build Package
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #     - name: before_script
-  #       run: |
-  #         corepack enable
-  #         corepack prepare pnpm@latest-10 --activate
-  #         pnpm config set store-dir .pnpm-store
-  #     - name: Install dependencies
-  #       run: pnpm install
-  #     - name: Build project
-  #       run: pnpm build
-
-  artifact:
-    name: Upload Artifact
+  push_job:
+    name: Build and Upload
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
@@ -69,8 +51,8 @@ jobs:
           name: vue2048-build
           path: dist/
 
-  analyze:
-    name: Static Analysis
+  pull_request_job:
+    name: Pull Request Checks
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     steps:
