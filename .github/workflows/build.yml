@@ -10,6 +10,19 @@ on:
       - lab9
       - main
   workflow_dispatch:
+    inputs:
+      build:
+        description: 'Build the project'
+        required: true
+        default: 'true'
+      upload:
+        description: 'Upload the artifact'
+        required: true
+        default: 'true'
+      analyze:
+        description: 'Run static analysis'
+        required: true
+        default: 'true'
 
 jobs:
   build-package:
