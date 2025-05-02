@@ -32,6 +32,8 @@ on:
         required: false
         default: false
 
+env:
+  SHELL: /bin/bash
 
 jobs:
   push_job:
@@ -102,7 +104,6 @@ jobs:
         uses: actions/setup-node@v3
       - name: before_script
         run: |
-          export SHELL=/bin/bash
           corepack enable
           corepack prepare pnpm@latest-10 --activate
           pnpm config set store-dir .pnpm-store
