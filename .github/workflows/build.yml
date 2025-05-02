@@ -34,6 +34,7 @@ on:
 
 env:
   SHELL: /bin/bash
+  PNPM_HOME: /usr/local/bin
 
 jobs:
   push_job:
