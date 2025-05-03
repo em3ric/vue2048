@@ -78,8 +78,8 @@ jobs:
           corepack enable
           corepack prepare pnpm@latest-10 --activate
           pnpm config set store-dir .pnpm-store
-      # - name: Install dependencies
-      #   run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
       # - name: Build project
       #   run: pnpm build
       
@@ -87,7 +87,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vue2048-build
-          
+          path: dist/
       - name: Run type checking
         run: pnpm type-check
       - name: Fix linting issues
@@ -123,7 +123,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vue2048-build
-          # path: dist
+          path: dist/
       - name: Set up Node.js
         uses: actions/setup-node@v3
       - name: Install CLI
