@@ -69,15 +69,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event.inputs.build_run_analysis == 'true'
     steps:
-      # - name: Checkout code
-      #   uses: actions/checkout@v4
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v3
-      # - name: before_script
-      #   run: |
-      #     corepack enable
-      #     corepack prepare pnpm@latest-10 --activate
-      #     pnpm config set store-dir .pnpm-store
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+      - name: before_script
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest-10 --activate
+          pnpm config set store-dir .pnpm-store
       # - name: Install dependencies
       #   run: pnpm install
       # - name: Build project
