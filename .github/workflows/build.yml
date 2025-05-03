@@ -14,8 +14,8 @@ on:
       build_upload_artifact:
         type: boolean
         description: 'Build and Upload the artifact'
-        required: false
-        default: false
+        required: true
+        default: true
       build_run_analysis:
         type: boolean
         description: 'Build and Run Analysis'
@@ -65,23 +65,29 @@ jobs:
 
   pull_request_job:
     name: Pull Request Checks
+    needs: [push_job]
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event.inputs.build_run_analysis == 'true'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-      - name: before_script
-        run: |
-          corepack enable
-          corepack prepare pnpm@latest-10 --activate
-          pnpm config set store-dir .pnpm-store
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build project
-        run: pnpm build
-
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v3
+      # - name: before_script
+      #   run: |
+      #     corepack enable
+      #     corepack prepare pnpm@latest-10 --activate
+      #     pnpm config set store-dir .pnpm-store
+      # - name: Install dependencies
+      #   run: pnpm install
+      # - name: Build project
+      #   run: pnpm build
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vue2048-build
+          
       - name: Run type checking
         run: pnpm type-check
       - name: Fix linting issues
@@ -99,17 +105,17 @@ jobs:
       name: QA
     if: github.event.inputs.deploy_qa == 'true' 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-      - name: before_script
-        run: |
-          corepack enable
-          corepack prepare pnpm@latest-10 --activate
-          pnpm config set store-dir .pnpm-store
-      - name: Run pnpm setup
-        run: pnpm setup
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v3
+      # - name: before_script
+      #   run: |
+      #     corepack enable
+      #     corepack prepare pnpm@latest-10 --activate
+      #     pnpm config set store-dir .pnpm-store
+      # - name: Run pnpm setup
+      #   run: pnpm setup
 
       # - name: Checkout code
       #   uses: actions/checkout@v4
@@ -117,7 +123,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vue2048-build
-          path: dist
+          # path: dist
       - name: Set up Node.js
         uses: actions/setup-node@v3
       - name: Install CLI
