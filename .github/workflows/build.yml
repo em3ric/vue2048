@@ -38,10 +38,6 @@ on:
   schedule:
     - cron: '0 8 * * MON'
 
-# env:
-#   SHELL: /bin/bash
-#   PNPM_HOME: /usr/local/bin
-
 jobs:
   push_job:
     name: Build and Upload
