@@ -5,29 +5,44 @@ on:
     branches:
       - lab9
       - main
+    paths-ignore:
+      - 'docs/**'
   pull_request:
     branches:
       - lab9
       - main
+    paths-ignore:
+      - 'docs/**'
   workflow_dispatch:
     inputs:
-      build_upload_artifact:
+      run_analysis:
         type: boolean
-        description: 'Build and Upload the artifact'
+        description: 'Run Analysis'
         required: false
         default: false
-      build_run_analysis:
+      run_tests:
         type: boolean
-        description: 'Build and Run Analysis'
+        description: 'Run Tests'
         required: false
         default: false
-
+      deploy_qa:
+        type: boolean
+        description: 'Deploy to QA'
+        required: false
+        default: false
+      deploy_production:
+        type: boolean
+        description: 'Deploy to Production'
+        required: false
+        default: false
+  schedule:
+    - cron: '0 8 * * MON'
 
 jobs:
   push_job:
     name: Build and Upload
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.inputs.build_upload_artifact == 'true'
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,11 +64,13 @@ jobs:
         with:
           name: vue2048-build
           path: dist/
+          retention-days: ${{ github.ref == 'refs/heads/main' && 7 || 1 }}
 
   pull_request_job:
-    name: Pull Request Checks
+    name: Pull Request Analysis
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.event.inputs.build_run_analysis == 'true'
+    needs: [push_job]
+    if: github.event_name == 'pull_request' || github.event.inputs.run_analysis == 'true' || github.event.inputs.run_tests == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,58 +83,76 @@ jobs:
           pnpm config set store-dir .pnpm-store
       - name: Install dependencies
         run: pnpm install
-      - name: Build project
-        run: pnpm build
-
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vue2048-build
+          path: dist/
       - name: Run type checking
+        if: github.event_name == 'pull_request' || github.event.inputs.run_analysis == 'true'
         run: pnpm type-check
       - name: Fix linting issues
+        if: github.event_name == 'pull_request' || github.event.inputs.run_analysis == 'true'
         run: pnpm lint --fix
       - name: Run linter
+        if: github.event_name == 'pull_request' || github.event.inputs.run_analysis == 'true'
         run: pnpm lint
-      - name: Run quality
+
+      - name: Run unit tests
+        if: github.event_name == 'pull_request' || github.event.inputs.run_tests == 'true'
         run: pnpm test
 
-  # deploy_qa:
-  #   name: Deploy to QA
-  #   needs: [push_job, pull_request_job]
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: QA
-  #   if: github.event_name == 'workflow_dispatch'
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: vue2048-build
-  #         path: dist
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #     - name: Install CLI
-  #       run: npm install -g @azure/static-web-apps-cli
-  #     - name: Deploy to QA
-  #       run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-qa --env=production
+  deploy_qa:
+    name: Deploy to QA
+    needs: [push_job]
+    runs-on: ubuntu-latest
+    environment:
+      name: QA
+    if: github.event.inputs.deploy_qa == 'true' 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+      - name: before_script
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest-10 --activate
+          pnpm config set store-dir .pnpm-store
+      - name: Install dependencies
+        run: pnpm install
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vue2048-build
+          path: dist/
+      - name: Deploy to QA
+        run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-qa --env=production --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_QA }}
 
-  # deploy_production:
-  #   name: Deploy to Production
-  #   needs: [deploy_qa]
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: Prod
-  #   if: github.event_name == 'workflow_dispatch'
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: vue2048-build
-  #         path: dist
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #     - name: Install CLI
-  #       run: npm install -g @azure/static-web-apps-cli
-  #     - name: Deploy to Production
-  #       run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-prod --env=production
+  deploy_production:
+    name: Deploy to Production
+    needs: [push_job]
+    runs-on: ubuntu-latest
+    environment:
+      name: Prod
+    if: github.event.inputs.deploy_production == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+      - name: before_script
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest-10 --activate
+          pnpm config set store-dir .pnpm-store
+      - name: Install dependencies
+        run: pnpm install
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vue2048-build
+          path: dist/
+      - name: Deploy to Production
+        run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-prod --env=production --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
